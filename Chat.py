@@ -26,23 +26,26 @@ port = int(port)
 def Client():
 
     while(True):
-        print('Clique ENTER para iniciar o envio')
+        # Para começar a enviar uma mensagem, é pedido que o usuário digite ENTER
+        print('Digite ENTER para iniciar o envio')
         a = sys.stdin.read(1)
         l.acquire()
-        print('IP Destinatário: ')
-        IPDest = input()
+        # Input do IP do destinatário da mensagem
+        IPDest = input('\nIP Destinatário: ')
+        # Armazenando a porta e o IP em um objeto
         serverAddressPort = (IPDest, port)
+        # Input da mensagem a ser enviada
         msg = input('Mensagem: ')
-        a = sys.stdin.read(1)
         bytesToSend = str.encode(msg)
+        # Envio da mensagem para o IP e a porta selecionadas
         s.sendto(bytesToSend, serverAddressPort)
+        # Chamada da função de espera de ACK em outra thread
         ack_thread = threading.Thread(target=EsperaAck)
         ack_thread.start()
         l.release()
 
+
 # Função Servidor
-
-
 def Server():
 
     # Bind da porta sem IP específico, a fim de escutar qualquer outro computador na rede
@@ -54,44 +57,59 @@ def Server():
 
     while(True):
         bytesAddressPair = s2.recvfrom(bufferSize2)
+        l.acquire()
         message = bytesAddressPair[0]
         address = bytesAddressPair[1]
+        # respondendo ao cliente
+        s2.sendto(ServerResponse, address)
+        l.release()
 
         mostra_thread = threading.Thread(
             target=MostraMensagem, args=(message, address))
         mostra_thread.start()
 
-        # respondendo ao cliente
-        s2.sendto(ServerResponse, address)
 
 # Função de Espera da Resposta
-
-
 def EsperaAck():
 
     RcvMsg = s.recvfrom(bufferSize)
-    msg2 = "Message of ACK {}".format(RcvMsg[0])
+    msg2 = "\nMensagem de ACK {}".format(RcvMsg[0])
     print(msg2)
+    EsperaResposta()
 
 
+# Função que mostra a mensagem e produz uma resposta
 def MostraMensagem(message, address):
 
     l.acquire()
-    clientMsg = "Message from Client:{}".format(message)
-    clientIP = "Client IP Address:{}".format(address)
+    # Na tela é mostrada a mensagem e o IP do cliente
+    clientMsg = "\n\tMensagem do Cliente:{}".format(message)
+    clientIP = "\tIP do Cliente:{}".format(address)
     print(clientMsg)
     print(clientIP)
-    Resposta = input("Resposta: ")
+    # Input da Resposta para o cliente
+    Resposta = input("\nResposta: ")
     bytesToResend = str.encode(Resposta)
-    s.sendto(bytesToResend, address)
+    s2.sendto(bytesToResend, address)
     l.release()
 
 
+def EsperaResposta():
+
+    RcvMsg = s.recvfrom(bufferSize)
+    msg2 = "\n\tMensagem de Resposta {}".format(RcvMsg[0])
+    clientIP = "\tIP do Cliente:{}".format(RcvMsg[1])
+    print(msg2)
+    print(clientIP)
+
+
+# Criação das threads de servidor e cliente
 server_thread = threading.Thread(target=Server)
 client_thread = threading.Thread(target=Client)
 
+# Começo das threads
 server_thread.start()
 client_thread.start()
 
-server_thread.join()
-client_thread.join()
+# server_thread.join()
+# client_thread.join()
