@@ -1,9 +1,7 @@
-# Importando a biblioteca socket
+# Importando as bibliotecas necessárias
 import socket
-
-# Importando a biblioteca Threading
 import threading
-
+import time
 import sys
 
 # definindo o tamanho do buffer
@@ -15,6 +13,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 print("Sockets criados com sucesso")
 
+# Criando um Lock para controle
 l = threading.Lock()
 
 # Setando a porta que será utilizada
@@ -59,7 +58,7 @@ def Server():
         address = bytesAddressPair[1]
 
         mostra_thread = threading.Thread(
-            target=MostraMensagem, args=(message, address, ServerResponse))
+            target=MostraMensagem, args=(message, address))
         mostra_thread.start()
 
         # respondendo ao cliente
@@ -75,7 +74,7 @@ def EsperaAck():
     print(msg2)
 
 
-def MostraMensagem(message, address, ServerResponse):
+def MostraMensagem(message, address):
 
     l.acquire()
     clientMsg = "Message from Client:{}".format(message)
