@@ -56,19 +56,19 @@ bufferSize2 = 1024
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 print("Sockets criados com sucesso")
-
 # Criando um Lock para controle
 l = threading.Lock()
 
 # Setando a porta que será utilizada
 port = input('Porta do servidor: ')
 port = int(port)
-
 # Função CLiente
 
 
 def Client():
-
+    
+    #fazendo o bind do socket do cliente (necessário para conseguir recuperar a porta antes de ter enviado alguma coisa)
+    s.bind(('', port+1))
     while(True):
         # Para começar a enviar uma mensagem, é pedido que o usuário digite ENTER
         print('Digite ENTER para iniciar o envio')
@@ -76,11 +76,13 @@ def Client():
         l.acquire()
         # Input do IP do destinatário da mensagem
         IPDest = input('\nIP Destinatário: ')
+        portaDest = input('\nPorta do Destinatário: ')
         # Armazenando a porta e o IP em um objeto
-        serverAddressPort = (IPDest, port)
+        serverAddressPort = (IPDest, portaDest)
         # Input da mensagem a ser enviada
         msg = input('Mensagem: ')
-        bytesToSend = str.encode(msg)
+        
+        bytesToSend = str.encode(codificarMensagem(socket.gethostbyname(socket.gethostname()), IPDest,s.getsockname()[1], portaDest, time.time(), msg))
         # Envio da mensagem para o IP e a porta selecionadas
         s.sendto(bytesToSend, serverAddressPort)
         # Chamada da função de espera de ACK em outra thread
@@ -102,8 +104,9 @@ def Server():
     while(True):
         bytesAddressPair = s2.recvfrom(bufferSize2)
         l.acquire()
-        message = bytesAddressPair[0]
+        JSON = bytesAddressPair[0]
         address = bytesAddressPair[1]
+        decodedJSON = json.loads(JSON)
         # respondendo ao cliente
         s2.sendto(ServerResponse, address)
         l.release()
