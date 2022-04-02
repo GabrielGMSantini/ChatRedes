@@ -3,6 +3,50 @@ import socket
 import threading
 import time
 import sys
+import json
+
+
+#definindo funções de manipulação JSON
+import json
+
+def codificarMensagem(IP_origem,IP_destino,Porta_origem,Porta_destino,Timestamp,Mensagem):
+    x={
+        "IP_origem": IP_origem,
+        "IP_destino": IP_destino,
+        "Porta_origem": Porta_origem,
+        "Porta_destino": Porta_destino,
+        "Timestamp da mensagem": Timestamp,
+        "Mensagem": Mensagem
+    }
+    return json.dumps(x)
+
+def codificarACK(IP_origem,IP_destino,Porta_origem,Porta_destino,Timestamporiginal,Timestampresposta,ACK):
+    x = {
+        "IP_origem": IP_origem,
+        "IP_destino": IP_destino,
+        "Porta_origem": Porta_origem,
+        "Porta_destino": Porta_destino,
+        "Timestamp da mensagem original": Timestamporiginal,
+        "Timestamp da mensagem de resposta": Timestampresposta,
+        "ACK": ACK
+    }
+    return json.dumps(x)
+
+def codificarResposta(IP_origem,IP_destino,Porta_origem,Porta_destino,Timestamporiginal,Timestampresposta,Mensagemoriginal,Mensagemresposta):
+    x = {
+        "IP_origem": IP_origem,
+        "IP_destino": IP_destino,
+        "Porta_origem": Porta_origem,
+        "Porta_destino": Porta_destino,
+        "Timestamp da mensagem original": Timestamporiginal,
+        "Timestamp da mensagem de resposta": Timestampresposta,
+        "Mensagem Original": Mensagemoriginal,
+        "Mensagem de resposta": Mensagemresposta
+    }
+    return json.dumps(x)
+
+
+
 
 # definindo o tamanho do buffer
 bufferSize = 1024
