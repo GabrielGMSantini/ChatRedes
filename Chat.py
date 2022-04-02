@@ -97,10 +97,6 @@ def Server():
     # Bind da porta sem IP específico, a fim de escutar qualquer outro computador na rede
     s2.bind(('', port))
     print("Bind feito na porta %s" % (port))
-
-    ackFromServer = "ACK"
-    ServerResponse = str.encode(ackFromServer)
-
     while(True):
         bytesAddressPair = s2.recvfrom(bufferSize2)
         l.acquire()
@@ -108,11 +104,11 @@ def Server():
         address = bytesAddressPair[1]
         decodedJSON = json.loads(JSON)
         # respondendo ao cliente
-        s2.sendto(ServerResponse, address)
+        s2.sendto(str.encode(codificarACK(socket.gethostbyname(socket.gethostname()), decodedJSON["IP_origem"],decodedJSON["Porta_destino"],decodedJSON["Porta_origem"],decodedJSON["Timestamp da mensagem"], time.time(),True)), address)
         l.release()
 
         mostra_thread = threading.Thread(
-            target=MostraMensagem, args=(message, address))
+            target=MostraMensagem, args=(decodedJSON))
         mostra_thread.start()
 
 
@@ -120,15 +116,18 @@ def Server():
 def EsperaAck():
 
     RcvMsg = s.recvfrom(bufferSize)
-    msg2 = "\nMensagem de ACK {}".format(RcvMsg[0])
-    print(msg2)
+    JSONACK = RcvMsg[0]
+    decodedACK = json.loads(JSONACK)
+    print("ACK :" + str(decodedACK["ACK"]))
     EsperaResposta()
 
 
 # Função que mostra a mensagem e produz uma resposta
-def MostraMensagem(message, address):
+def MostraMensagem(decodedJSON):
 
     l.acquire()
+    message = decodedJSON["Mensagem"]
+    address = decodedJSON["IP_origem"]
     # Na tela é mostrada a mensagem e o IP do cliente
     clientMsg = "\n\tMensagem do Cliente:{}".format(message)
     clientIP = "\tIP do Cliente:{}".format(address)
@@ -136,18 +135,22 @@ def MostraMensagem(message, address):
     print(clientIP)
     # Input da Resposta para o cliente
     Resposta = input("\nResposta: ")
-    bytesToResend = str.encode(Resposta)
-    s2.sendto(bytesToResend, address)
+    bytesToResend = str.encode(codificarResposta(socket.gethostbyname(socket.gethostname()), decodedJSON["IP_origem"], s2.getsockname()[1], decodedJSON["Porta_origem"], decodedJSON["Timestamp da mensagem"], time.time(), decodedJSON["Mensagem"], Resposta))
+    s2.sendto(bytesToResend, (address, decodedJSON["Porta_origem"]))
     l.release()
 
 
 def EsperaResposta():
 
     RcvMsg = s.recvfrom(bufferSize)
-    msg2 = "\n\tMensagem de Resposta {}".format(RcvMsg[0])
-    clientIP = "\tIP do Cliente:{}".format(RcvMsg[1])
-    print(msg2)
+    JSONResposta = RcvMsg[0]
+    decodedResposta = json.loads(JSONResposta)
+    msgOriganal = "\n\tMensagem Original: {}".format(decodedResposta["Mensagem Original"])
+    msg2 = "\n\tMensagem de Resposta {}".format(decodedResposta["Mensagem de resposta"])
+    clientIP = "\tIP da Resposta:{}".format(decodedResposta["IP_origem"])
+    print(msgOriganal)
     print(clientIP)
+    print(msg2)
 
 
 # Criação das threads de servidor e cliente
