@@ -48,6 +48,12 @@ def codificarResposta(IP_origem, IP_destino, Porta_origem, Porta_destino, Timest
     }
     return json.dumps(x)
 
+#Criando uma função para printar o menu
+def printMenu():
+    print("-----------------Menu-----------------")
+    print("---Você tem %d mensagens não lidas----"%(mensagensRecebidas))
+    print("[E] Escrever mensagem")
+    print("[R] Ler e responder mensagens")
 
 # definindo o tamanho do buffer
 bufferSize = 1024
@@ -66,7 +72,8 @@ ip = input('Seu IP: ')
 # Setando a porta que será utilizada
 port = input('Sua Porta: ')
 port = int(port)
-
+global mensagensRecebidas
+mensagensRecebidas = 0
 
 # Função Cliente
 def Client():
@@ -75,6 +82,9 @@ def Client():
     s.bind(('', port+1))
     while(True):
         # Para começar a enviar uma mensagem, é pedido que o usuário digite ENTER
+        l.acquire()
+        printMenu()
+        l.release()
         print('Digite ENTER para iniciar o envio')
         a = sys.stdin.read(1)
         l.acquire()
@@ -104,16 +114,20 @@ def Server():
     s2.bind(('', port))
     s3.bind(('', port-1))
     print("Bind feito na porta %s" % (port))
+    global mensagensRecebidas
+    mensagensRecebidas = 0
     while(True):
         bytesAddressPair = s2.recvfrom(bufferSize2)
-        l.acquire()
         JSON = bytesAddressPair[0]
-        print(JSON)
         address = bytesAddressPair[1]
         decodedJSON = json.loads(JSON)
         # respondendo ao cliente
         s2.sendto(str.encode(codificarACK(ip, decodedJSON["IP_origem"], decodedJSON["Porta_destino"],
                   decodedJSON["Porta_origem"], decodedJSON["Timestamp da mensagem"], time.time(), True)), address)
+        l.acquire()
+        mensagensRecebidas = mensagensRecebidas + 1
+        print(mensagensRecebidas)
+        printMenu()
         l.release()
 
         mostra_thread = threading.Thread(
@@ -140,19 +154,24 @@ def EsperaAck():
 
 # Função que mostra a mensagem e produz uma resposta
 def MostraMensagem(IP_origem, Porta_origem, Timestamp, Mensagem, address):
-
+    
     l.acquire()
     message = Mensagem
+    global mensagensRecebidas
     # Na tela é mostrada a mensagem e o IP do cliente
     clientMsg = "\n\tMensagem do Cliente:{}".format(message)
     clientIP = "\tIP do Cliente:{}".format(IP_origem)
     print(clientMsg)
     print(clientIP)
     # Input da Resposta para o cliente
-    Resposta = input("\nResposta: ")
+    print(address)
+    Resposta = input("Resposta: ")
     bytesToResend = str.encode(codificarResposta(ip, IP_origem, s2.getsockname()[
                                1], Porta_origem, Timestamp, time.time(), Mensagem, Resposta))
+    time.sleep(3)
     s3.sendto(bytesToResend, address)
+    print("Enviada Resposta")
+    mensagensRecebidas -=1
     l.release()
 
 
