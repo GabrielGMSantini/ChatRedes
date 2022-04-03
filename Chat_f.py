@@ -61,8 +61,10 @@ print("Sockets criados com sucesso")
 # Criando um Lock para controle
 l = threading.Lock()
 
+ip = input('Seu IP: ')
+
 # Setando a porta que será utilizada
-port = input('Porta do servidor: ')
+port = input('Sua Porta: ')
 port = int(port)
 
 
@@ -85,8 +87,8 @@ def Client():
         # Input da mensagem a ser enviada
         msg = input('Mensagem: ')
 
-        bytesToSend = str.encode(codificarMensagem(socket.gethostbyname(
-            socket.gethostname()), IPDest, s.getsockname()[1], portaDest, time.time(), msg))
+        bytesToSend = str.encode(codificarMensagem(
+            ip, IPDest, s.getsockname()[1], portaDest, time.time(), msg))
         # Envio da mensagem para o IP e a porta selecionadas
         s.sendto(bytesToSend, serverAddressPort)
         # Chamada da função de espera de ACK em outra thread
@@ -110,55 +112,62 @@ def Server():
         address = bytesAddressPair[1]
         decodedJSON = json.loads(JSON)
         # respondendo ao cliente
-        s2.sendto(str.encode(codificarACK(socket.gethostbyname(socket.gethostname(
-        )), decodedJSON["IP_origem"], decodedJSON["Porta_destino"], decodedJSON["Porta_origem"], decodedJSON["Timestamp da mensagem"], time.time(), True)), address)
+        s2.sendto(str.encode(codificarACK(ip, decodedJSON["IP_origem"], decodedJSON["Porta_destino"],
+                  decodedJSON["Porta_origem"], decodedJSON["Timestamp da mensagem"], time.time(), True)), address)
         l.release()
 
         mostra_thread = threading.Thread(
-            target=MostraMensagem, args=(decodedJSON["IP_origem"], decodedJSON["Porta_origem"], decodedJSON["Timestamp da mensagem"], decodedJSON["Mensagem"]))
+            target=MostraMensagem, args=(decodedJSON["IP_origem"], decodedJSON["Porta_origem"], decodedJSON["Timestamp da mensagem"], decodedJSON["Mensagem"], address))
         mostra_thread.start()
 
 
 # Função de Espera da Resposta
 def EsperaAck():
-
-    RcvMsg = s.recvfrom(bufferSize)
-    JSONACK = RcvMsg[0]
-    decodedACK = json.loads(JSONACK)
-    print("ACK :" + str(decodedACK["ACK"]))
-    EsperaResposta()
+    s.settimeout(30)
+    try:
+        RcvMsg = s.recvfrom(bufferSize)
+        s.settimeout(None)
+        JSONACK = RcvMsg[0]
+        decodedACK = json.loads(JSONACK)
+        print("ACK :" + str(decodedACK["ACK"]))
+        EsperaResposta()
+    except Exception:
+        l.acquire()
+        print("\tACK não recebido")
+        l.release()
+    s.settimeout(None)
 
 
 # Função que mostra a mensagem e produz uma resposta
-def MostraMensagem(IP_origem, Porta_origem, Timestamp, Mensagem):
+def MostraMensagem(IP_origem, Porta_origem, Timestamp, Mensagem, address):
 
     l.acquire()
     message = Mensagem
-    address = IP_origem
     # Na tela é mostrada a mensagem e o IP do cliente
     clientMsg = "\n\tMensagem do Cliente:{}".format(message)
-    clientIP = "\tIP do Cliente:{}".format(address)
+    clientIP = "\tIP do Cliente:{}".format(IP_origem)
     print(clientMsg)
     print(clientIP)
     # Input da Resposta para o cliente
     Resposta = input("\nResposta: ")
-    bytesToResend = str.encode(codificarResposta(socket.gethostbyname(socket.gethostname()), IP_origem, s2.getsockname()[
+    bytesToResend = str.encode(codificarResposta(ip, IP_origem, s2.getsockname()[
                                1], Porta_origem, Timestamp, time.time(), Mensagem, Resposta))
-    s3.sendto(bytesToResend, (address, Porta_origem))
+    s3.sendto(bytesToResend, address)
     l.release()
 
 
 def EsperaResposta():
 
+    print("Esperando Resposta...")
     RcvMsg = s.recvfrom(bufferSize)
     JSONResposta = RcvMsg[0]
     decodedResposta = json.loads(JSONResposta)
-    msgOriganal = "\n\tMensagem Original: {}".format(
+    msgOriginal = "\n\tMensagem Original: {}".format(
         decodedResposta["Mensagem Original"])
     msg2 = "\n\tMensagem de Resposta {}".format(
         decodedResposta["Mensagem de resposta"])
     clientIP = "\tIP da Resposta:{}".format(decodedResposta["IP_origem"])
-    print(msgOriganal)
+    print(msgOriginal)
     print(clientIP)
     print(msg2)
 
