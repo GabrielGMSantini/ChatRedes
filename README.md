@@ -34,6 +34,6 @@ Python
 
 <h2> 👥 Integrantes do Projeto </h2>
 
-<h3>Gabriel Gonçalves Mattos Santini</h3>
-<h3>Gustavo Campos Dias</h3>
-<h3>Gustavo Melo Cacau</h3>
+<h4>Gabriel Gonçalves Mattos Santini</h4>
+<h4>Gustavo Campos Dias</h4>
+<h4>Gustavo Melo Cacau</h4>
