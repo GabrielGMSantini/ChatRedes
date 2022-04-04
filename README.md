@@ -1,7 +1,7 @@
 <h1 align="center"> Chat entre Terminais usando Sockets e Threads </h1>
 
 <p align="center">
-<img src="http://img.shields.io/static/v1?label=STATUS&message=FINALIZADO&color=BLUE&style=for-the-badge"/>
+<img src="http://img.shields.io/static/v1?label=STATUS&message=BETA&color=BLUE&style=for-the-badge"/>
 </p>
 
 <h2> ✍ Descrição do Projeto </h2>
