@@ -1,8 +1,10 @@
 <h1 align="center"> Chat entre Terminais usando Socket e Threads </h1>
 
-![Badge Finalizado](http://img.shields.io/static/v1?label=STATUS&message=FINALIZADO&color=RED&style=for-the-badge)
+<p align="center">
+<img src="http://img.shields.io/static/v1?label=STATUS&message=FINALIZADO&color=BLUE&style=for-the-badge"/>
+</p>
 
-<h2> Descrição do Projeto </h2>
+<h2> ✍ Descrição do Projeto </h2>
 
 Projeto feito no laboratório 04 da disciplina de Redes de Computadores A, sobre o oitavo semestre do curso de Engenharia da Computação lecionado pelo professor Leandro Alonso Xastre, na Pontifícia Universidade Católica de Campinas, no ano de 2022.
 
@@ -26,12 +28,12 @@ Caso o ACK seja positivo, o sistema irá esperar uma resposta do destinatário, 
 
 Para responder uma mensagem após recebê-la, o usuário deverá escolher a opção de resposta e logo após, teclar ENTER por medida de segurança a fim da limpeza de buffer, mandando assim a resposta que será notificada na tela de quem mandou a mensagem inicial.
 
-## Tecnologias Usadas
+## ✅ Tecnologias Usadas
 
--> Python
+Python
 
-<h2> Integrantes do Projeto </h2>
+<h2> 👥 Integrantes do Projeto </h2>
 
-Gabriel Gonçalves Mattos Santini
-Gustavo Campos Dias
-Gustavo Melo Cacau
+<h3>Gabriel Gonçalves Mattos Santini</h3>
+<h3>Gustavo Campos Dias</h3>
+<h3>Gustavo Melo Cacau</h3>
