@@ -1,4 +1,4 @@
-<h1 align="center"> Chat entre Terminais usando Socket e Threads </h1>
+<h1 align="center"> Chat entre Terminais usando Sockets e Threads </h1>
 
 <p align="center">
 <img src="http://img.shields.io/static/v1?label=STATUS&message=FINALIZADO&color=BLUE&style=for-the-badge"/>
@@ -10,17 +10,17 @@ Projeto feito no laboratório 04 da disciplina de Redes de Computadores A, sobre
 
 O projeto consiste em desenvolver um chat de terminal para linux onde um cliente e um servidor em computadores diferentes consigam mandar mensagens, receber confirmação de envio desta mensagem e enviar uma resposta para o mesmo IP do remetente da mensagem. A linguagem escolhida para a realização do mesmo foi o Python, com o uso de threads e sockets.
 
-## :hammer: Funcionalidades do projeto
+## :hammer: Funcionalidades do Projeto
 
 - `Envio de Mensagem`: Definindo-se um IP para a máquina e sua porta, é possível enviar mensagens utilizando soquetes.
 - `Receber ACK`: Para verificar se a mensagem chegou com sucesso no destinatário escolhido, é possível receber um sinal de ACK
 - `Envio de Resposta`: Com a confirmação de recebimento de mensagem, é possível que o destinatário da mensagem mande uma resposta para o servidor de quem a enviou
 
-## 📁 Acesso ao projeto
+## 📁 Acesso ao Projeto
 
 O Acesso ao projeto é feito pelo Download do arquivo "Chat.py", sendo o Python 3 necessário para o rodar no terminal.
 
-## 🛠️ Abrir e rodar o projeto
+## 🛠️ Abrir e rodar o Projeto
 
 Ao executar o arquivo, primeiro é pedido que o usuário digite seu IP e a porta que o seu servidor usará, o que é importante para que outros usuários possam mandar mensagens nesse servidor. Desta forma, um menu irá aparecer com opções de envio e resposta. A opção de resposta apenas funcionará se houver alguma mensagem recebida pelo servidor.
 Escolhida a opção de envio, primeiro o sistema irá perguntar o IP e a porta do destinatário da mensagem e por fim, pedirá que o usuário escreva a mensagem, o que fará com que o servidor espere uma mensagem de ACK.
@@ -30,7 +30,7 @@ Para responder uma mensagem após recebê-la, o usuário deverá escolher a opç
 
 ## ✅ Tecnologias Usadas
 
-Python
+<h5>Python 3</h5>
 
 <h2> 👥 Integrantes do Projeto </h2>
 
